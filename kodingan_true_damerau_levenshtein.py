@@ -1,50 +1,53 @@
 import numpy as np
-# from itertools import product 
+def _is_character_same(cost, string1, string2, i, j):
+
+	return
+
 def true_damerau_levenshtein_distance(string1,string2):
-	da = list(range(0,26))
+	da = [0] * 26
 	
-	for i in range(26):
-		da[(i)] = 0
+	length_text_1 = len(string1)
+	length_text_2 = len(string2)
 
-	# d=np.array([for i in range(0,len(string1))]) #gayakin
-	lens1 = len(string1)
-	lens2 = len(string2)
-	# a = np.array([i for i in range(0,lens1+2)])
-	# b = np.array([i for i in range(0,lens2+1)])
-	# d=np.array([a,b])
-	# print(d.shape)
-	# d = np.reshape(lens1+2,lens2+2)
+	d = np.zeros((length_text_1 + 2, length_text_2 + 2))
+	max_distance = length_text_1 + length_text_2
 
-	d ={}
-	maxdistance = lens1+lens2
-	d[-1,-1] = maxdistance
+	d[1, 1] = max_distance
 
-	for i in range(-2,lens1+2):
-		d[(i,-1)] = maxdistance
-		d[(i,-2)] = i+2
+	for i in range(0, length_text_1 + 1):
+		d[i, -1] = max_distance
+		d[i, 0] = i
 	
-	for j in range(-2,lens2+2):
-		d[(-1,j)] = maxdistance
-		d[(-1,j)] = j+2
+	for j in range(0, length_text_2 + 1):
+		d[-1, j] = max_distance
+		d[0, j] = j
 	
-	for i in range(lens1):
+	for i in range(1, length_text_1 + 1):
 		db=0
-		for j in range(lens2):
-			k=da[j]
+		for j in range(1, length_text_2 + 1):
+			k=da[j+1]
 			l=db
-			if (string1[i] == string2[j]):
+			
+			if (string1[i-1] == string2[j-1]):
 				cost = 0
 				db = j
 			else:
 				cost=1
-			d[(i,j)] = min(
-                            d[(i-1,j-1)] + cost, # substitution
-                            d[(i,j-1)] + 1, # insertion
-							d[(i-1,j)] + 1, # deletion
-							d[(k-1),(l-1)] + (i-k-1) + 1 + (j-l-1), #transposision
-                          )
-			da[i]=i
+
+			subtitution = d[i-1, j-1] + cost
+			insertion = d[i,j-1] + 1
+			deletion = d[i-1, j] + 1
+			transposition = d[k-1, l-1] + (i-k-1) + 1 + (j-l-1)
+			
+			minimum = min(	subtitution, 
+							insertion, 
+							deletion, 
+							transposition)
+
+			d[i,j] = minimum
+			da[i] = i
 	
-	return d[lens1-2,lens2-2]
+	print(d)
+	return d[length_text_1,length_text_2]
 	
-print(true_damerau_levenshtein_distance('la i-la i', 'laki-laki'))
+print(true_damerau_levenshtein_distance('an act','a cat'))
